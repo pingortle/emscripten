@@ -3376,7 +3376,8 @@ ok
   # on both sides.
   @needs_dlfcn
   def test_dylink_funcpointer(self):
-    self.dylink_test(r'''
+    self.dylink_test(
+      main=r'''
       #include <stdio.h>
       #include <assert.h>
       #include "header.h"
@@ -3388,18 +3389,20 @@ ok
         b(0);
         return 0;
       }
-    ''', '''
+      ''',
+      side='''
       #include "header.h"
       intfunc sidey(intfunc f) { f(1); return f; }
-    ''',
-    expected='hello from funcptr: 1\nhello from funcptr: 0\n',
-    header='typedef void (*intfunc)(int );')
+      ''',
+      expected='hello from funcptr: 1\nhello from funcptr: 0\n',
+      header='typedef void (*intfunc)(int );')
 
   @needs_dlfcn
   # test dynamic linking of a module with multiple function pointers, stored
   # statically
   def test_dylink_static_funcpointers(self):
-    self.dylink_test(r'''
+    self.dylink_test(
+      main=r'''
       #include <stdio.h>
       #include "header.h"
       void areturn0() { printf("hello 0\n"); }
@@ -3412,17 +3415,19 @@ ok
         sidey(table[2]);
         return 0;
       }
-    ''', '''
+      ''',
+      side='''
       #include "header.h"
       void sidey(voidfunc f) { f(); }
-    ''',
-    expected='hello 0\nhello 1\nhello 2\n',
-    header='typedef void (*voidfunc)(); void sidey(voidfunc f);')
+      ''',
+      expected='hello 0\nhello 1\nhello 2\n',
+      header='typedef void (*voidfunc)(); void sidey(voidfunc f);')
 
   @no_wasm('uses function tables in an asm.js specific way')
   @needs_dlfcn
   def test_dylink_asmjs_funcpointers(self):
-    self.dylink_test(main=r'''
+    self.dylink_test(
+      main=r'''
       #include "header.h"
       #include <emscripten.h>
       void left1() { printf("left1\n"); }
@@ -3453,8 +3458,8 @@ ok
         second();
         return 0;
       }
-    ''',
-    side=r'''
+      ''',
+      side=r'''
       #include "header.h"
       void right1() { printf("right1\n"); }
       void right2() { printf("right2\n"); }
@@ -3472,9 +3477,9 @@ ok
         f = (volatilevoidfunc)right2;
         f();
       }
-    ''',
-    expected='main\nleft1\nleft2\nright1\nright2\nsecond\nleft1\nleft2\nright1\nright2\n',
-    header='''
+      ''',
+      expected='main\nleft1\nleft2\nright1\nright2\nsecond\nleft1\nleft2\nright1\nright2\n',
+      header='''
       #include <stdio.h>
       typedef void (*voidfunc)();
       typedef volatile voidfunc volatilevoidfunc;
@@ -3483,11 +3488,12 @@ ok
       voidfunc getright1();
       voidfunc getright2();
       void second();
-    ''', need_reverse=False, auto_load=False)
+      ''', need_reverse=False, auto_load=False)
 
   @needs_dlfcn
   def test_dylink_funcpointers_wrapper(self):
-    self.dylink_test(r'''
+    self.dylink_test(
+      main=r'''\
       #include <stdio.h>
       #include "header.h"
       int main(int argc, char **argv) {
@@ -3497,22 +3503,24 @@ ok
         f2("out('two')");
         return 0;
       }
-    ''', '''
+      ''',
+      side='''\
       #include "header.h"
       charfunc get() {
         return emscripten_run_script;
       }
-    ''',
-    expected='one\ntwo\n',
-    header='''
+      ''',
+      expected='one\ntwo\n',
+      header='''\
       #include <emscripten.h>
       typedef void (*charfunc)(const char*);
       extern charfunc get();
-    ''')
+      ''')
 
   @needs_dlfcn
   def test_dylink_static_funcpointer_float(self):
-    self.dylink_test(r'''
+    self.dylink_test(
+      main=r'''\
       #include <stdio.h>
       #include "header.h"
       int sidey(floatfunc f);
@@ -3523,12 +3531,13 @@ ok
         f1(12.34);
         return 0;
       }
-    ''', '''
+      ''',
+      side='''\
       #include "header.h"
       int sidey(floatfunc f) { f(56.78); return 1; }
-    ''',
-    expected='hello 1: 56.779999\ngot: 1\nhello 1: 12.340000\n',
-    header='typedef float (*floatfunc)(float);')
+      ''',
+      expected='hello 1: 56.779999\ngot: 1\nhello 1: 12.340000\n',
+      header='typedef float (*floatfunc)(float);')
 
   @needs_dlfcn
   def test_dylink_global_init(self):
