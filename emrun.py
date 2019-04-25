@@ -462,6 +462,7 @@ class HTTPWebServer(socketserver.ThreadingMixIn, HTTPServer):
               if not emrun_options.browser:
                 logv('Try passing the --browser=/path/to/browser option to avoid this from occurring. See https://github.com/emscripten-core/emscripten/issues/3234 for more discussion.')
             else:
+              logv("shutdown1");
               self.shutdown()
               logv('Browser process has quit. Shutting down web server.. Pass --serve_after_close to keep serving the page even after the browser closes.')
 
@@ -473,6 +474,7 @@ class HTTPWebServer(socketserver.ThreadingMixIn, HTTPServer):
       # If web page was silent for too long without printing anything, kill process.
       time_since_message = now - last_message_time
       if emrun_options.silence_timeout != 0 and time_since_message > emrun_options.silence_timeout:
+        logv("shutdown2");
         self.shutdown()
         logi('No activity in ' + str(emrun_options.silence_timeout) + ' seconds. Quitting web server with return code ' + str(emrun_options.timeout_returncode) + '. (--silence_timeout option)')
         page_exit_code = emrun_options.timeout_returncode
@@ -481,6 +483,7 @@ class HTTPWebServer(socketserver.ThreadingMixIn, HTTPServer):
       # If the page has been running too long as a whole, kill process.
       time_since_start = now - page_start_time
       if emrun_options.timeout != 0 and time_since_start > emrun_options.timeout:
+        logv("shutdown3");
         self.shutdown()
         logi('Page has not finished in ' + str(emrun_options.timeout) + ' seconds. Quitting web server with return code ' + str(emrun_options.timeout_returncode) + '. (--timeout option)')
         emrun_options.kill_on_exit = True
@@ -645,6 +648,7 @@ class HTTPHandler(SimpleHTTPRequestHandler):
       elif not emrun_options.serve_after_exit:
         page_exit_code = int(data[6:])
         logv('Web page has quit with a call to exit() with return code ' + str(page_exit_code) + '. Shutting down web server. Pass --serve_after_exit to keep serving even after the page terminates with exit().')
+        logv("shutdown4");
         self.server.shutdown()
 
     self.send_response(200)
@@ -1668,7 +1672,9 @@ def run():
 
   if not options.no_server:
     try:
+      logv('Started web server.')
       httpd.serve_forever()
+      logv('Stopped?? servering, no exception.')
     except KeyboardInterrupt:
       pass
     httpd.server_close()
