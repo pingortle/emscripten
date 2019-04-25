@@ -180,9 +180,9 @@ def check_call(cmd, *args, **kw):
   try:
     return run_process(cmd, *args, **kw)
   except subprocess.CalledProcessError as e:
-    exit_with_error("'%s' failed (%d)", ' '.join(cmd), e.returncode)
+    exit_with_error("'%s' failed (%d)", ' '.join(e.cmd), e.returncode)
   except OSError as e:
-    exit_with_error("'%s' failed: %s", ' '.join(cmd), str(e))
+    exit_with_error("'%s' failed: %s", ' '.join(e.cmd), str(e))
 
 
 def generate_config(path, first_time=False):
