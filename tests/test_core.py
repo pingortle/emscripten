@@ -3498,7 +3498,7 @@ ok
       #include "header.h"
       int main(int argc, char **argv) {
         charfunc f1 = emscripten_run_script;
-        f2("out('one')");
+        f1("out('one')");
         charfunc f2 = get();
         f2("out('two')");
         return 0;
