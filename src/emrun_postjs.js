@@ -17,6 +17,8 @@ if (typeof window === "object" && (typeof ENVIRONMENT_IS_PTHREAD === 'undefined'
       }
     }
 
+    debugLog('emrun_register_handlers');
+
     // When C code exit()s, we may still have remaining stdout and stderr messages in flight. In that case, we can't close
     // the browser until all those XHRs have finished, so the following state variables track that all communication is done,
     // after which we can close.
