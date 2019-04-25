@@ -505,6 +505,7 @@ function loadWebAssemblyModule(binary, flags) {
       assert(table === originalTable);
       assert(table === wasmTable);
       if (instance.exports['table']) {
+        console.log("exported table...");
         assert(table === instance.exports['table']);
       }
       // the old part of the table should be unchanged

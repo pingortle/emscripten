@@ -3408,11 +3408,11 @@ ok
       void areturn0() { printf("hello 0\n"); }
       void areturn1() { printf("hello 1\n"); }
       void areturn2() { printf("hello 2\n"); }
-      voidfunc table[3] = { areturn0, areturn1, areturn2 };
+      voidfunc func_ptrs[3] = { areturn0, areturn1, areturn2 };
       int main(int argc, char **argv) {
-        sidey(table[0]);
-        sidey(table[1]);
-        sidey(table[2]);
+        sidey(func_ptrs[0]);
+        sidey(func_ptrs[1]);
+        sidey(func_ptrs[2]);
         return 0;
       }
       ''',
